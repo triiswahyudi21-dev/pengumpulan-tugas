@@ -4,12 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Pengumpulan & Penilaian Tugas Video</title>
+    <!-- Tailwind CSS & FontAwesome -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- SDK FIREBASE REALTIME DATABASE -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen p-4 md:p-8 flex justify-center items-center">
 
-    <!-- Container Utama Fleksibel -->
+    <!-- Container Utama -->
     <div id="mainContainer" class="w-full max-w-sm bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden transition-all duration-300 flex flex-col justify-between">
         
         <div>
@@ -19,10 +24,10 @@
                     <i class="fa-solid fa-graduation-cap text-2xl text-yellow-300"></i>
                     <h1 class="text-xl font-bold">Portal Tugas Video</h1>
                 </div>
-                <p class="text-[11px] text-indigo-200">Sistem Pengumpulan & Penilaian Tugas</p>
+                <p class="text-[11px] text-indigo-200">Sistem Pengumpulan & Penilaian Online</p>
             </div>
 
-            <!-- ================= TAMPILAN 1: KOTAK LOGIN PORTRAIT ================= -->
+            <!-- ================= TAMPILAN 1: FORM LOGIN ================= -->
             <div id="sectionAuth" class="p-6 space-y-6">
                 <div class="text-center space-y-1">
                     <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-2 text-xl shadow-inner">
@@ -32,7 +37,6 @@
                     <p class="text-[11px] text-slate-500 px-2">Masukkan akun Siswa atau Guru Anda untuk melanjutkan</p>
                 </div>
 
-                <!-- Form Login Tunggal -->
                 <form onsubmit="prosesLoginUtama(event)" class="space-y-4">
                     <div class="space-y-1">
                         <label class="block text-[11px] font-bold text-slate-700">Username</label>
@@ -54,7 +58,6 @@
                         </div>
                     </div>
 
-                    <!-- Tombol Login -->
                     <button type="submit" class="w-full mt-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-xs shadow-md transition flex items-center justify-center gap-2">
                         <i class="fa-solid fa-right-to-bracket"></i>
                         <span>Masuk Portal</span>
@@ -64,7 +67,6 @@
 
             <!-- ================= TAMPILAN 2: DASHBOARD SISWA ================= -->
             <div id="sectionSiswa" class="p-6 space-y-5 hidden">
-                <!-- User Status Bar -->
                 <div class="flex justify-between items-center bg-indigo-50 p-3 rounded-xl border border-indigo-100 text-xs">
                     <div>
                         <span class="text-slate-500">Status Login:</span> 
@@ -82,9 +84,8 @@
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Pilih Kelas <span class="text-red-500">*</span></label>
-                            <select id="siswaKelas" disabled class="w-full p-2.5 bg-slate-100 border border-slate-300 rounded-lg text-xs outline-none cursor-not-allowed">
-                                <option value="" disabled selected>-- Pilih Kelas --</option>
+                            <label class="block text-[11px] font-semibold text-slate-600 mb-1">Kelas Anda</label>
+                            <select id="siswaKelas" disabled class="w-full p-2.5 bg-slate-100 border border-slate-300 rounded-lg text-xs outline-none cursor-not-allowed font-bold text-slate-700">
                                 <option value="8A">Kelas 8A</option>
                                 <option value="8B">Kelas 8B</option>
                                 <option value="8C">Kelas 8C</option>
@@ -101,26 +102,21 @@
                         </div>
                     </div>
 
-                    <!-- Kolom Anggota Kelompok -->
                     <div>
                         <label class="block text-[11px] font-semibold text-slate-600 mb-1">Daftar Anggota Kelompok <span class="text-red-500">*</span></label>
-                        <textarea id="siswaAnggota" rows="2" placeholder="Masukkan nama anggota kelompok (misal: 1. Ahmad, 2. Budi, 3. Citra)" class="w-full p-2.5 bg-white border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                        <textarea id="siswaAnggota" rows="2" placeholder="Contoh: 1. Ahmad, 2. Budi, 3. Citra" class="w-full p-2.5 bg-white border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
                     </div>
                 </div>
 
-                <!-- HASIL PENILAIAN DARI GURU -->
+                <!-- HASIL PENILAIAN ONLINE -->
                 <div class="bg-emerald-50/80 border border-emerald-200 p-4 rounded-xl space-y-2 shadow-sm">
                     <div class="flex justify-between items-center">
                         <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-900 flex items-center gap-1.5">
                             <i class="fa-solid fa-award text-emerald-600 text-sm"></i> HASIL PENILAIAN GURU
                         </h3>
-                        <button onclick="renderNilaiSiswa()" class="text-[10px] text-emerald-700 hover:underline flex items-center gap-1 font-semibold">
-                            <i class="fa-solid fa-rotate-right"></i> Refresh
-                        </button>
                     </div>
-                    
                     <div id="boxHasilNilai" class="text-xs text-slate-600 pt-1">
-                        <!-- Terisi otomatis via JS -->
+                        <!-- Otomatis sinkron dari Firebase -->
                     </div>
                 </div>
 
@@ -132,57 +128,51 @@
                         Pilih Metode Pengiriman Tugas <span class="text-red-500">*</span>
                     </label>
 
-                    <!-- Tab Pilihan Metode -->
                     <div class="grid grid-cols-2 gap-2">
                         <button type="button" onclick="setMethod('drive')" id="tabDrive" class="p-3 border-2 border-indigo-600 bg-indigo-50 text-indigo-900 rounded-xl flex items-center justify-center gap-2 text-xs font-bold transition">
                             <i class="fa-brands fa-google-drive text-emerald-600 text-lg"></i>
-                            Upload ke Drive Guru
+                            Upload ke Drive
                         </button>
                         <button type="button" onclick="setMethod('link')" id="tabLink" class="p-3 border-2 border-slate-200 text-slate-600 rounded-xl flex items-center justify-center gap-2 text-xs font-bold hover:border-slate-300 transition">
                             <i class="fa-solid fa-link text-indigo-600 text-base"></i>
-                            Kirim Link Sosial Media
+                            Kirim Link Medsos
                         </button>
                     </div>
 
-                    <!-- Opsi A: Link Folder Drive Guru -->
                     <div id="methodDriveArea" class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl text-center space-y-2">
-                        <p class="text-xs text-emerald-800 font-medium">Unggah berkas video Anda langsung ke folder Google Drive Guru kelas ini:</p>
-                        <a id="btnGoToDrive" href="#" target="_blank" rel="noopener noreferrer" 
-                           class="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-lg text-xs shadow transition w-full">
+                        <p class="text-xs text-emerald-800 font-medium">Unggah berkas video Anda ke Google Drive Guru:</p>
+                        <a id="btnGoToDrive" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-lg text-xs shadow transition w-full">
                             <i class="fa-brands fa-google-drive text-yellow-300"></i>
-                            <span id="btnDriveText">Pilih Kelas Dulu untuk Buka Drive</span>
+                            <span id="btnDriveText">Buka Folder Drive</span>
                             <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
                         </a>
                     </div>
 
-                    <!-- Opsi B: Input Link Media Sosial -->
                     <div id="methodLinkArea" class="hidden bg-slate-50 border border-slate-200 p-4 rounded-xl space-y-3">
                         <div class="flex gap-3 text-slate-500 justify-center text-lg pb-1">
-                            <i class="fa-brands fa-youtube text-red-600" title="YouTube"></i>
-                            <i class="fa-brands fa-tiktok text-black" title="TikTok"></i>
-                            <i class="fa-brands fa-instagram text-pink-600" title="Instagram"></i>
-                            <i class="fa-brands fa-google-drive text-emerald-600" title="Google Drive"></i>
+                            <i class="fa-brands fa-youtube text-red-600"></i>
+                            <i class="fa-brands fa-tiktok text-black"></i>
+                            <i class="fa-brands fa-instagram text-pink-600"></i>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1">Tempelkan Link URL Video</label>
-                            <input type="url" id="linkVideoUrl" placeholder="https://www.youtube.com/watch?v=... atau link TikTok/IG" class="w-full p-2.5 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Tempelkan Link Video</label>
+                            <input type="url" id="linkVideoUrl" placeholder="https://www.youtube.com/watch?v=..." class="w-full p-2.5 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
                         </div>
                     </div>
 
-                    <!-- Form Identitas Tugas -->
                     <form onsubmit="handleFormSubmit(event)" class="space-y-3">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Mata Pelajaran</label>
-                            <input type="text" id="mapel" required placeholder="Contoh: Prakarya / Bahasa Indonesia" class="w-full p-2.5 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500">
+                            <input type="text" id="mapel" required placeholder="Contoh: Prakarya" class="w-full p-2.5 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500">
                         </div>
 
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1">Judul Video / Tugas</label>
-                            <input type="text" id="judulVideo" required placeholder="Contoh: Video Drama Kelompok 3" class="w-full p-2.5 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500">
+                            <input type="text" id="judulVideo" required placeholder="Contoh: Video Drama Kelompok 1" class="w-full p-2.5 border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500">
                         </div>
 
                         <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg shadow text-xs transition">
-                            <i class="fa-solid fa-paper-plane mr-1"></i> Simpan Laporan Pengumpulan
+                            <i class="fa-solid fa-paper-plane mr-1"></i> Kirim Tugas Online
                         </button>
                     </form>
                 </div>
@@ -190,50 +180,42 @@
 
             <!-- ================= TAMPILAN 3: DASHBOARD GURU ================= -->
             <div id="sectionGuru" class="p-6 space-y-5 hidden">
-                <!-- User Status Bar Guru -->
                 <div class="flex justify-between items-center border-b pb-2">
                     <span class="text-xs font-bold text-emerald-700 flex items-center gap-1">
                         <i class="fa-solid fa-circle-check"></i> Terautentikasi sebagai Guru
                     </span>
-                    <div class="flex gap-3 items-center">
-                        <button onclick="logout()" class="text-[11px] text-red-600 font-semibold hover:underline">
-                            <i class="fa-solid fa-right-from-bracket"></i> Keluar
-                        </button>
-                    </div>
+                    <button onclick="logout()" class="text-[11px] text-red-600 font-semibold hover:underline">
+                        <i class="fa-solid fa-right-from-bracket"></i> Keluar
+                    </button>
                 </div>
 
-                <!-- Bagian A: Folder Drive Kelas -->
+                <!-- Folder Drive Kelas -->
                 <div class="space-y-2">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-600">Folder Drive per Kelas:</h3>
-                    <div id="driveLinksList" class="space-y-1.5 max-h-36 overflow-y-auto pr-1">
-                        <!-- Terisi otomatis via JS -->
-                    </div>
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-600">Folder Drive Kelas:</h3>
+                    <div id="driveLinksList" class="space-y-1.5 max-h-36 overflow-y-auto pr-1"></div>
                 </div>
 
-                <!-- Bagian B: Daftar Tugas Dikirim Siswa -->
+                <!-- Daftar Tugas Masuk Real-Time -->
                 <div class="space-y-2">
                     <div class="flex justify-between items-center">
                         <h3 class="text-xs font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
-                            <i class="fa-solid fa-inbox text-indigo-600"></i> Daftar Tugas Masuk dari Siswa
+                            <i class="fa-solid fa-inbox text-indigo-600"></i> Tugas Masuk (Real-Time Online)
                         </h3>
-                        <button onclick="hapusSemuaTugas()" class="text-[10px] bg-red-100 hover:bg-red-200 text-red-700 font-bold px-2 py-1 rounded transition flex items-center gap-1">
-                            <i class="fa-solid fa-trash-can"></i> Hapus Semua Data & Nilai
+                        <button onclick="hapusSemuaTugas()" class="text-[10px] bg-red-100 hover:bg-red-200 text-red-700 font-bold px-2 py-1 rounded transition">
+                            <i class="fa-solid fa-trash-can"></i> Hapus Semua Data
                         </button>
                     </div>
-                    <div id="daftarTugasSiswa" class="space-y-2 max-h-48 overflow-y-auto pr-1">
-                        <!-- Terisi otomatis via JS -->
-                    </div>
+                    <div id="daftarTugasSiswa" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
                 </div>
 
-                <!-- Bagian C: Form Penilaian Guru -->
+                <!-- Form Penilaian Guru -->
                 <div class="bg-indigo-50/70 border border-indigo-100 p-4 rounded-xl space-y-4">
                     <div class="flex justify-between items-center">
                         <h3 class="text-xs font-bold uppercase tracking-wider text-indigo-900 flex items-center gap-1.5">
-                            <i class="fa-solid fa-clipboard-check text-indigo-600"></i> Form Penilaian Tugas Video
+                            <i class="fa-solid fa-clipboard-check text-indigo-600"></i> Form Penilaian Tugas
                         </h3>
-                        <!-- TOMBOL DOWNLOAD EXCEL -->
                         <button onclick="downloadExcelNilai()" class="text-[10px] bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2.5 py-1 rounded shadow transition flex items-center gap-1">
-                            <i class="fa-solid fa-file-excel"></i> Download Excel (.csv)
+                            <i class="fa-solid fa-file-excel"></i> Download CSV
                         </button>
                     </div>
 
@@ -241,7 +223,7 @@
                         <div class="grid grid-cols-2 gap-2">
                             <div>
                                 <label class="block text-[11px] font-semibold text-slate-700 mb-1">Pilih Kelas</label>
-                                <select id="penilaianKelas" required class="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500">
+                                <select id="penilaianKelas" required class="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs outline-none">
                                     <option value="" disabled selected>Kelas</option>
                                     <option value="8A">8A</option>
                                     <option value="8B">8B</option>
@@ -255,21 +237,19 @@
                             </div>
                             <div>
                                 <label class="block text-[11px] font-semibold text-slate-700 mb-1">Nama Kelompok</label>
-                                <input type="text" id="penilaianSiswa" required placeholder="Nama Kelompok" class="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500">
+                                <input type="text" id="penilaianSiswa" required placeholder="Nama Kelompok" class="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs outline-none">
                             </div>
                         </div>
 
-                        <!-- Rubrik Penilaian Video -->
                         <div class="bg-white p-3 rounded-lg border border-indigo-100 space-y-2 text-xs">
-                            <span class="font-bold text-slate-700 block text-[11px] border-b pb-1">Rubrik Penilaian (Skala 0 - 100):</span>
-                            
+                            <span class="font-bold text-slate-700 block text-[11px] border-b pb-1">Rubrik Penilaian (0 - 100):</span>
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
                                     <label class="block text-[11px] text-slate-600">Kesesuaian Materi</label>
                                     <input type="number" id="skorMateri" min="0" max="100" placeholder="0-100" oninput="hitungTotalNilai()" class="w-full p-1.5 border border-slate-300 rounded text-xs">
                                 </div>
                                 <div>
-                                    <label class="block text-[11px] text-slate-600">Kreativitas & Editing</label>
+                                    <label class="block text-[11px] text-slate-600">Kreativitas/Editing</label>
                                     <input type="number" id="skorKreativitas" min="0" max="100" placeholder="0-100" oninput="hitungTotalNilai()" class="w-full p-1.5 border border-slate-300 rounded text-xs">
                                 </div>
                                 <div>
@@ -281,35 +261,49 @@
                                     <input type="number" id="skorWaktu" min="0" max="100" placeholder="0-100" oninput="hitungTotalNilai()" class="w-full p-1.5 border border-slate-300 rounded text-xs">
                                 </div>
                             </div>
-
                             <div class="pt-2 flex justify-between items-center border-t border-slate-100">
-                                <span class="font-bold text-slate-700">Rata-rata Nilai Akhir:</span>
+                                <span class="font-bold text-slate-700">Rata-rata Nilai:</span>
                                 <span id="nilaiAkhir" class="text-base font-extrabold text-indigo-700">0</span>
                             </div>
                         </div>
 
                         <div>
                             <label class="block text-[11px] font-semibold text-slate-700 mb-1">Catatan / Umpan Balik Guru</label>
-                            <textarea id="catatanGuru" rows="2" placeholder="Masukkan masukan atau saran..." class="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                            <textarea id="catatanGuru" rows="2" placeholder="Masukkan masukan/saran..." class="w-full p-2 bg-white border border-slate-300 rounded-lg text-xs outline-none"></textarea>
                         </div>
 
                         <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 rounded-lg text-xs shadow transition">
-                            <i class="fa-solid fa-floppy-disk mr-1"></i> Simpan & Kirim Nilai ke Siswa
+                            <i class="fa-solid fa-floppy-disk mr-1"></i> Simpan Nilai Online
                         </button>
                     </form>
                 </div>
             </div>
         </div>
 
-        <!-- FOOTER CATATAN HAK CIPTA -->
         <div class="bg-slate-50 border-t border-slate-200 py-3 text-center text-[11px] text-slate-500 font-medium">
             © Hak Cipta Mr. Jack 2026
         </div>
-
     </div>
 
+    <!-- SCRIPT UTAMA LOGIKA & FIREBASE -->
     <script>
-        // METADATA USER KELAS SISWA (Username & Password)
+        // 1. ISI DENGAN KONFIGURASI FIREBASE ANDA
+        const firebaseConfig = {
+           apiKey: "AIzaSyAtuji51uUCnTDmHEXusSz736c72x3dYOM",
+    authDomain: "pengumpulan-tugas-ee871.firebaseapp.com",
+    databaseURL: "https://pengumpulan-tugas-ee871-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "pengumpulan-tugas-ee871",
+    storageBucket: "pengumpulan-tugas-ee871.firebasestorage.app",
+    messagingSenderId: "981874876326",
+    appId: "1:981874876326:web:ffd6a7459fb53a67a07967",
+    measurementId: "G-YM52XF5RJB"
+  };
+
+        // Inisialisasi Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Data Akun Siswa & Folder Drive
         const AKUN_SISWA = {
             "siswa_8A": { pass: "siswa_8a", kelas: "8A" },
             "siswa_8B": { pass: "siswa_8b", kelas: "8B" },
@@ -321,44 +315,35 @@
             "siswa_9D": { pass: "siswa_9d", kelas: "9D" }
         };
 
-        // METADATA DRIVE KELAS GURU
         const DRIVE_FOLDERS = {
-            "8A": "https://drive.google.com/drive/folders/LINK_DRIVE_KELAS_8A",
-            "8B": "https://drive.google.com/drive/folders/LINK_DRIVE_KELAS_8B",
-            "8C": "https://drive.google.com/drive/folders/LINK_DRIVE_KELAS_8C",
-            "8D": "https://drive.google.com/drive/folders/LINK_DRIVE_KELAS_8D",
+            "8A": "https://drive.google.com/drive/folders/LINK_KELAS_8A",
+            "8B": "https://drive.google.com/drive/folders/LINK_KELAS_8B",
+            "8C": "https://drive.google.com/drive/folders/LINK_KELAS_8C",
+            "8D": "https://drive.google.com/drive/folders/LINK_KELAS_8D",
             "9A": "https://drive.google.com/drive/folders/1952R6W2CT9WmVpJzyOzQD8peW-gpem_e",
             "9B": "https://drive.google.com/drive/folders/1bG3touyI1pF5BikilOkt9hB28pZKsMt2",
             "9C": "https://drive.google.com/drive/folders/1gSLzrJJZTNwyAuP0bIbGvPds6n7-Lb5-",
             "9D": "https://drive.google.com/drive/folders/1jIxBDLeaNSvrj8JqJ1N4k-NjqGdljSBQ"
         };
 
-        // DATABASE NILAI & TUGAS (LocalStorage)
-        let dbNilai = JSON.parse(localStorage.getItem('dbNilaiTugasVideo')) || {};
-        let dbTugasSiswa = JSON.parse(localStorage.getItem('dbTugasSiswaVideo')) || [];
-
-        let activeUser = null; 
+        let activeUser = null;
         let currentMethod = 'drive';
 
-        // PROSES LOGIN SEPARASI SISWA / GURU DENGAN VALIDASI HAK AKSES
+        // Autentikasi Login
         function prosesLoginUtama(e) {
             e.preventDefault();
             const username = document.getElementById('loginUsername').value.trim();
             const password = document.getElementById('loginPassword').value.trim();
             const container = document.getElementById('mainContainer');
 
-            // 1. Pengecekan Khusus Akun Guru
             if (username === 'guru') {
                 if (password === 'guru123') {
                     activeUser = { role: 'guru' };
                     renderGuruDriveLinks();
                     renderGuruTugasMasuk();
                     
-                    container.classList.remove('max-w-sm');
-                    container.classList.add('max-w-xl');
-
+                    container.className = "w-full max-w-xl bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden transition-all duration-300 flex flex-col justify-between";
                     document.getElementById('sectionAuth').classList.add('hidden');
-                    document.getElementById('sectionSiswa').classList.add('hidden');
                     document.getElementById('sectionGuru').classList.remove('hidden');
                     return;
                 } else {
@@ -367,7 +352,6 @@
                 }
             }
 
-            // 2. Pengecekan Khusus Akun Siswa
             if (AKUN_SISWA[username]) {
                 if (AKUN_SISWA[username].pass === password) {
                     const kelasAuto = AKUN_SISWA[username].kelas;
@@ -380,11 +364,8 @@
 
                     updateIdentitasSiswa();
 
-                    container.classList.remove('max-w-sm');
-                    container.classList.add('max-w-xl');
-
+                    container.className = "w-full max-w-xl bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden transition-all duration-300 flex flex-col justify-between";
                     document.getElementById('sectionAuth').classList.add('hidden');
-                    document.getElementById('sectionGuru').classList.add('hidden');
                     document.getElementById('sectionSiswa').classList.remove('hidden');
                     return;
                 } else {
@@ -393,7 +374,6 @@
                 }
             }
 
-            // 3. Username Tidak Terdaftar
             alert('Username tidak terdaftar!');
         }
 
@@ -419,7 +399,6 @@
 
         function updateIdentitasSiswa() {
             if (!activeUser || activeUser.role !== 'siswa') return;
-            
             const kelas = document.getElementById('siswaKelas').value;
             const nama = document.getElementById('siswaNama').value.trim();
 
@@ -431,10 +410,7 @@
 
             if (kelas && DRIVE_FOLDERS[kelas]) {
                 btnLink.href = DRIVE_FOLDERS[kelas];
-                btnText.innerText = `Buka Folder Drive Guru (${kelas})`;
-            } else {
-                btnLink.href = "#";
-                btnText.innerText = "Pilih Kelas Dulu untuk Buka Drive";
+                btnText.innerText = `Buka Drive (${kelas})`;
             }
 
             renderNilaiSiswa();
@@ -446,17 +422,59 @@
             document.getElementById('loginPassword').value = "";
             
             const container = document.getElementById('mainContainer');
-            container.classList.remove('max-w-xl');
-            container.classList.add('max-w-sm');
+            container.className = "w-full max-w-sm bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden transition-all duration-300 flex flex-col justify-between";
 
             document.getElementById('sectionSiswa').classList.add('hidden');
             document.getElementById('sectionGuru').classList.add('hidden');
             document.getElementById('sectionAuth').classList.remove('hidden');
         }
 
+        // SIMPAN TUGAS ONLINE KE FIREBASE (Siswa)
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const kelas = document.getElementById('siswaKelas').value;
+            const nama = document.getElementById('siswaNama').value.trim();
+            const anggota = document.getElementById('siswaAnggota').value.trim();
+            const mapel = document.getElementById('mapel').value.trim();
+            const judul = document.getElementById('judulVideo').value.trim();
+            const linkUrl = document.getElementById('linkVideoUrl').value.trim();
+
+            if (!kelas || !nama || !anggota) {
+                alert('Lengkapi identitas kelompok dan anggota terlebih dahulu!');
+                return;
+            }
+
+            if (currentMethod === 'link' && !linkUrl) {
+                alert('Masukkan link URL video tugas Anda!');
+                return;
+            }
+
+            const tugasBaru = {
+                kelas: kelas,
+                nama: nama,
+                anggota: anggota,
+                mapel: mapel,
+                judul: judul,
+                metode: currentMethod,
+                url: currentMethod === 'link' ? linkUrl : DRIVE_FOLDERS[kelas],
+                waktu: new Date().toLocaleString('id-ID')
+            };
+
+            db.ref('tugas_siswa').push(tugasBaru, (error) => {
+                if (error) {
+                    alert('Gagal mengirim ke server! Periksa koneksi internet.');
+                } else {
+                    alert('Tugas berhasil dikirim secara online ke Guru!');
+                    document.getElementById('mapel').value = '';
+                    document.getElementById('judulVideo').value = '';
+                    document.getElementById('linkVideoUrl').value = '';
+                }
+            });
+        }
+
+        // AMBIL NILAI REAL-TIME DARI FIREBASE (Tampilan Siswa)
         function renderNilaiSiswa() {
             if (!activeUser || activeUser.role !== 'siswa') return;
-
             const box = document.getElementById('boxHasilNilai');
 
             if (!activeUser.kelas || !activeUser.nama) {
@@ -469,176 +487,53 @@
                 return;
             }
 
-            dbNilai = JSON.parse(localStorage.getItem('dbNilaiTugasVideo')) || {};
-            const key = `${activeUser.kelas}_${activeUser.nama.toLowerCase()}`;
-            const data = dbNilai[key];
+            const key = `${activeUser.kelas}_${activeUser.nama.toLowerCase().replace(/\s+/g, '_')}`;
 
-            if (data) {
-                box.innerHTML = `
-                    <div class="space-y-3 bg-white p-4 rounded-lg border border-emerald-200 shadow-sm">
-                        <div class="flex justify-between items-center border-b pb-2">
+            db.ref('nilai_siswa/' + key).on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    box.innerHTML = `
+                        <div class="space-y-3 bg-white p-4 rounded-lg border border-emerald-200 shadow-sm">
+                            <div class="flex justify-between items-center border-b pb-2">
+                                <div>
+                                    <span class="text-[10px] uppercase font-bold text-slate-400 block">Status</span>
+                                    <span class="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                                        <i class="fa-solid fa-circle-check"></i> Sudah Dinilai
+                                    </span>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-[10px] uppercase font-bold text-slate-400 block">Nilai Akhir</span>
+                                    <span class="text-2xl font-black text-emerald-600">${data.nilai} <span class="text-xs text-slate-400 font-normal">/ 100</span></span>
+                                </div>
+                            </div>
+                            ${data.skor ? `
+                            <div class="space-y-1 bg-slate-50 p-2.5 rounded border border-slate-100 text-xs">
+                                <div class="flex justify-between"><span>Materi</span><span class="font-bold text-indigo-700">${data.skor.materi}</span></div>
+                                <div class="flex justify-between"><span>Kreativitas</span><span class="font-bold text-indigo-700">${data.skor.kreativitas}</span></div>
+                                <div class="flex justify-between"><span>Kualitas</span><span class="font-bold text-indigo-700">${data.skor.kualitas}</span></div>
+                                <div class="flex justify-between"><span>Waktu</span><span class="font-bold text-indigo-700">${data.skor.waktu}</span></div>
+                            </div>` : ''}
                             <div>
-                                <span class="text-[10px] uppercase font-bold text-slate-400 block">Status Penilaian</span>
-                                <span class="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
-                                    <i class="fa-solid fa-circle-check"></i> Sudah Dinilai
-                                </span>
-                            </div>
-                            <div class="text-right">
-                                <span class="text-[10px] uppercase font-bold text-slate-400 block">Nilai Akhir</span>
-                                <span class="text-2xl font-black text-emerald-600">${data.nilai} <span class="text-xs text-slate-400 font-normal">/ 100</span></span>
+                                <span class="text-[11px] font-bold text-slate-700 block">Catatan Guru:</span>
+                                <p class="text-xs text-slate-600 italic bg-amber-50/60 p-2 rounded border border-amber-100 mt-0.5">"${data.catatan || 'Belum ada catatan.'}"</p>
                             </div>
                         </div>
-
-                        ${data.skor ? `
-                        <div>
-                            <span class="text-[11px] font-bold text-slate-700 block mb-1">Rincian Nilai Komponen:</span>
-                            <div class="space-y-1 bg-slate-50 p-2.5 rounded border border-slate-100 text-slate-700 text-xs">
-                                <div class="flex justify-between items-center border-b border-slate-200/60 pb-1">
-                                    <span>Kesesuaian Materi</span>
-                                    <span class="font-bold text-indigo-700">${data.skor.materi}</span>
-                                </div>
-                                <div class="flex justify-between items-center border-b border-slate-200/60 pb-1">
-                                    <span>Kreativitas & Editing</span>
-                                    <span class="font-bold text-indigo-700">${data.skor.kreativitas}</span>
-                                </div>
-                                <div class="flex justify-between items-center border-b border-slate-200/60 pb-1">
-                                    <span>Kualitas Visual & Suara</span>
-                                    <span class="font-bold text-indigo-700">${data.skor.kualitas}</span>
-                                </div>
-                                <div class="flex justify-between items-center">
-                                    <span>Ketepatan Waktu</span>
-                                    <span class="font-bold text-indigo-700">${data.skor.waktu}</span>
-                                </div>
+                    `;
+                } else {
+                    box.innerHTML = `
+                        <div class="p-3 bg-white rounded-lg border border-amber-200 text-amber-800 flex items-center gap-2">
+                            <i class="fa-solid fa-hourglass-half text-amber-500 text-base"></i>
+                            <div>
+                                <p class="font-bold text-xs">Belum Ada Penilaian</p>
+                                <p class="text-[11px]">Tugas Anda belum dinilai oleh Guru.</p>
                             </div>
-                        </div>` : ''}
-
-                        <div>
-                            <span class="text-[11px] font-bold text-slate-700 block">Catatan / Feedback Guru:</span>
-                            <p class="text-xs text-slate-600 italic bg-amber-50/60 p-2.5 rounded border border-amber-100 mt-0.5">
-                                "${data.catatan || 'Belum ada catatan tambahan dari guru.'}"
-                            </p>
                         </div>
-
-                        <div class="text-[10px] text-slate-400 text-right pt-1 border-t border-slate-100">
-                            Tanggal penilaian: ${data.tanggal}
-                        </div>
-                    </div>
-                `;
-            } else {
-                box.innerHTML = `
-                    <div class="p-3 bg-white rounded-lg border border-amber-200 text-amber-800 flex items-center gap-2">
-                        <i class="fa-solid fa-hourglass-half text-amber-500 text-base"></i>
-                        <div>
-                            <p class="font-bold text-xs">Belum Ada Penilaian</p>
-                            <p class="text-[11px]">Tugas Anda sedang diproses atau belum dinilai oleh Guru.</p>
-                        </div>
-                    </div>
-                `;
-            }
-        }
-
-        function handleFormSubmit(e) {
-            e.preventDefault();
-            const kelas = document.getElementById('siswaKelas').value;
-            const nama = document.getElementById('siswaNama').value.trim();
-            const anggota = document.getElementById('siswaAnggota').value.trim();
-            const mapel = document.getElementById('mapel').value.trim();
-            const judul = document.getElementById('judulVideo').value.trim();
-            const linkUrl = document.getElementById('linkVideoUrl').value.trim();
-
-            if (!kelas || !nama || !anggota) {
-                alert('Lengkapi identitas kelas, nama kelompok, dan anggota terlebih dahulu!');
-                return;
-            }
-
-            if (currentMethod === 'link' && !linkUrl) {
-                alert('Masukkan link URL video tugas Anda!');
-                return;
-            }
-
-            const tugasBaru = {
-                id: Date.now(),
-                kelas: kelas,
-                nama: nama,
-                anggota: anggota,
-                mapel: mapel,
-                judul: judul,
-                metode: currentMethod,
-                url: currentMethod === 'link' ? linkUrl : DRIVE_FOLDERS[kelas],
-                waktu: new Date().toLocaleString('id-ID')
-            };
-
-            dbTugasSiswa.unshift(tugasBaru);
-            localStorage.setItem('dbTugasSiswaVideo', JSON.stringify(dbTugasSiswa));
-
-            alert('Laporan tugas berhasil dikirim!');
-            document.getElementById('mapel').value = '';
-            document.getElementById('judulVideo').value = '';
-            document.getElementById('linkVideoUrl').value = '';
-        }
-
-        function renderGuruDriveLinks() {
-            const container = document.getElementById('driveLinksList');
-            container.innerHTML = '';
-
-            Object.keys(DRIVE_FOLDERS).forEach(kelas => {
-                const link = DRIVE_FOLDERS[kelas];
-                const item = document.createElement('div');
-                item.className = "flex justify-between items-center bg-slate-50 p-2 rounded border text-xs";
-                item.innerHTML = `
-                    <span class="font-bold text-slate-700">Drive Kelas ${kelas}</span>
-                    <a href="${link}" target="_blank" class="text-indigo-600 hover:underline flex items-center gap-1 font-medium">
-                        Buka Folder <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
-                    </a>
-                `;
-                container.appendChild(item);
+                    `;
+                }
             });
         }
 
-        function renderGuruTugasMasuk() {
-            const container = document.getElementById('daftarTugasSiswa');
-            dbTugasSiswa = JSON.parse(localStorage.getItem('dbTugasSiswaVideo')) || [];
-
-            if (dbTugasSiswa.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-400 italic text-center py-2">Belum ada tugas yang dikirim oleh siswa.</p>`;
-                return;
-            }
-
-            container.innerHTML = dbTugasSiswa.map(tugas => `
-                <div class="bg-white p-3 rounded-lg border border-slate-200 text-xs space-y-1">
-                    <div class="flex justify-between font-bold text-slate-800">
-                        <span>[${tugas.kelas}] ${tugas.nama}</span>
-                        <span class="text-[10px] text-slate-400">${tugas.waktu}</span>
-                    </div>
-                    <p class="text-slate-600"><strong>Mapel:</strong> ${tugas.mapel} | <strong>Judul:</strong> ${tugas.judul}</p>
-                    <p class="text-slate-500"><strong>Anggota:</strong> ${tugas.anggota}</p>
-                    <div class="pt-1 flex justify-between items-center">
-                        <a href="${tugas.url}" target="_blank" class="text-indigo-600 font-semibold hover:underline flex items-center gap-1">
-                            <i class="fa-solid fa-link text-[10px]"></i> Lihat Berkas / Video
-                        </a>
-                        <button onclick="pilihSiswaNilai('${tugas.kelas}', '${tugas.nama}')" class="text-[10px] bg-indigo-100 text-indigo-700 font-bold px-2 py-0.5 rounded hover:bg-indigo-200">
-                            Nilai Tugas Ini
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function pilihSiswaNilai(kelas, nama) {
-            document.getElementById('penilaianKelas').value = kelas;
-            document.getElementById('penilaianSiswa').value = nama;
-        }
-
-        function hitungTotalNilai() {
-            const m = parseFloat(document.getElementById('skorMateri').value) || 0;
-            const k = parseFloat(document.getElementById('skorKreativitas').value) || 0;
-            const q = parseFloat(document.getElementById('skorKualitas').value) || 0;
-            const w = parseFloat(document.getElementById('skorWaktu').value) || 0;
-
-            const total = Math.round((m + k + q + w) / 4);
-            document.getElementById('nilaiAkhir').innerText = total;
-        }
-
+        // SIMPAN PENILAIAN ONLINE KE FIREBASE (Guru)
         function simpanPenilaian(e) {
             e.preventDefault();
             const kelas = document.getElementById('penilaianKelas').value;
@@ -647,12 +542,13 @@
             const catatan = document.getElementById('catatanGuru').value.trim();
 
             if (!kelas || !nama) {
-                alert('Pilih kelas dan masukkan nama kelompok!');
+                alert('Pilih kelas dan nama kelompok!');
                 return;
             }
 
-            const key = `${kelas}_${nama.toLowerCase()}`;
-            dbNilai[key] = {
+            const key = `${kelas}_${nama.toLowerCase().replace(/\s+/g, '_')}`;
+
+            const dataNilai = {
                 kelas: kelas,
                 nama: nama,
                 nilai: nilai,
@@ -666,54 +562,117 @@
                 tanggal: new Date().toLocaleDateString('id-ID')
             };
 
-            localStorage.setItem('dbNilaiTugasVideo', JSON.stringify(dbNilai));
-            alert(`Nilai untuk ${nama} (${kelas}) berhasil disimpan!`);
-            
-            document.getElementById('penilaianSiswa').value = '';
-            document.getElementById('skorMateri').value = '';
-            document.getElementById('skorKreativitas').value = '';
-            document.getElementById('skorKualitas').value = '';
-            document.getElementById('skorWaktu').value = '';
-            document.getElementById('catatanGuru').value = '';
-            document.getElementById('nilaiAkhir').innerText = '0';
+            db.ref('nilai_siswa/' + key).set(dataNilai, (error) => {
+                if (error) {
+                    alert('Gagal menyimpan nilai ke Firebase!');
+                } else {
+                    alert(`Nilai online untuk ${nama} (${kelas}) berhasil disimpan!`);
+                    document.getElementById('penilaianSiswa').value = '';
+                    document.getElementById('skorMateri').value = '';
+                    document.getElementById('skorKreativitas').value = '';
+                    document.getElementById('skorKualitas').value = '';
+                    document.getElementById('skorWaktu').value = '';
+                    document.getElementById('catatanGuru').value = '';
+                    document.getElementById('nilaiAkhir').innerText = '0';
+                }
+            });
+        }
+
+        // TAMPILKAN TUGAS MASUK SECARA REAL-TIME (Tampilan Guru)
+        function renderGuruTugasMasuk() {
+            const container = document.getElementById('daftarTugasSiswa');
+
+            db.ref('tugas_siswa').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (!data) {
+                    container.innerHTML = `<p class="text-xs text-slate-400 italic text-center py-2">Belum ada tugas yang dikirim oleh siswa.</p>`;
+                    return;
+                }
+
+                const daftarTugas = Object.values(data).reverse();
+
+                container.innerHTML = daftarTugas.map(tugas => `
+                    <div class="bg-white p-3 rounded-lg border border-slate-200 text-xs space-y-1">
+                        <div class="flex justify-between font-bold text-slate-800">
+                            <span>[${tugas.kelas}] ${tugas.nama}</span>
+                            <span class="text-[10px] text-slate-400">${tugas.waktu}</span>
+                        </div>
+                        <p class="text-slate-600"><strong>Mapel:</strong> ${tugas.mapel} | <strong>Judul:</strong> ${tugas.judul}</p>
+                        <p class="text-slate-500"><strong>Anggota:</strong> ${tugas.anggota}</p>
+                        <div class="pt-1 flex justify-between items-center">
+                            <a href="${tugas.url}" target="_blank" class="text-indigo-600 font-semibold hover:underline flex items-center gap-1">
+                                <i class="fa-solid fa-link text-[10px]"></i> Lihat Berkas
+                            </a>
+                            <button onclick="pilihSiswaNilai('${tugas.kelas}', '${tugas.nama}')" class="text-[10px] bg-indigo-100 text-indigo-700 font-bold px-2 py-0.5 rounded hover:bg-indigo-200">
+                                Nilai Tugas Ini
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            });
+        }
+
+        function renderGuruDriveLinks() {
+            const container = document.getElementById('driveLinksList');
+            container.innerHTML = '';
+            Object.keys(DRIVE_FOLDERS).forEach(kelas => {
+                const item = document.createElement('div');
+                item.className = "flex justify-between items-center bg-slate-50 p-2 rounded border text-xs";
+                item.innerHTML = `
+                    <span class="font-bold text-slate-700">Drive Kelas ${kelas}</span>
+                    <a href="${DRIVE_FOLDERS[kelas]}" target="_blank" class="text-indigo-600 hover:underline flex items-center gap-1 font-medium">
+                        Buka Folder <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                    </a>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function pilihSiswaNilai(kelas, nama) {
+            document.getElementById('penilaianKelas').value = kelas;
+            document.getElementById('penilaianSiswa').value = nama;
+        }
+
+        function hitungTotalNilai() {
+            const m = parseFloat(document.getElementById('skorMateri').value) || 0;
+            const k = parseFloat(document.getElementById('skorKreativitas').value) || 0;
+            const q = parseFloat(document.getElementById('skorKualitas').value) || 0;
+            const w = parseFloat(document.getElementById('skorWaktu').value) || 0;
+            document.getElementById('nilaiAkhir').innerText = Math.round((m + k + q + w) / 4);
         }
 
         function hapusSemuaTugas() {
-            if (confirm('Apakah Anda yakin ingin menghapus seluruh data pengumpulan dan nilai?')) {
-                localStorage.removeItem('dbTugasSiswaVideo');
-                localStorage.removeItem('dbNilaiTugasVideo');
-                dbTugasSiswa = [];
-                dbNilai = {};
-                renderGuruTugasMasuk();
-                alert('Seluruh data berhasil dibersihkan.');
+            if (confirm('Yakin ingin menghapus seluruh data pengumpulan dan nilai dari server online?')) {
+                db.ref('tugas_siswa').remove();
+                db.ref('nilai_siswa').remove();
+                alert('Seluruh data online telah dibersihkan.');
             }
         }
 
         function downloadExcelNilai() {
-            dbNilai = JSON.parse(localStorage.getItem('dbNilaiTugasVideo')) || {};
-            const keys = Object.keys(dbNilai);
+            db.ref('nilai_siswa').once('value', (snapshot) => {
+                const data = snapshot.val();
+                if (!data) {
+                    alert('Belum ada data nilai di Firebase!');
+                    return;
+                }
 
-            if (keys.length === 0) {
-                alert('Belum ada data nilai untuk diunduh!');
-                return;
-            }
+                let csv = 'Kelas,Nama Kelompok,Nilai Akhir,Materi,Kreativitas,Kualitas,Waktu,Catatan,Tanggal\n';
+                Object.keys(data).forEach(k => {
+                    const d = data[k];
+                    const catatanClean = d.catatan ? `"${d.catatan.replace(/"/g, '""')}"` : '""';
+                    csv += `${d.kelas},"${d.nama}",${d.nilai},${d.skor ? d.skor.materi : 0},${d.skor ? d.skor.kreativitas : 0},${d.skor ? d.skor.kualitas : 0},${d.skor ? d.skor.waktu : 0},${catatanClean},${d.tanggal}\n`;
+                });
 
-            let csv = 'Kelas,Nama Kelompok,Nilai Akhir,Materi,Kreativitas,Kualitas,Ketepatan Waktu,Catatan,Tanggal\n';
-
-            keys.forEach(k => {
-                const d = dbNilai[k];
-                const catatanClean = d.catatan ? `"${d.catatan.replace(/"/g, '""')}"` : '""';
-                csv += `${d.kelas},"${d.nama}",${d.nilai},${d.skor.materi},${d.skor.kreativitas},${d.skor.kualitas},${d.skor.waktu},${catatanClean},${d.tanggal}\n`;
+                const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.setAttribute('href', url);
+                link.setAttribute('download', `Nilai_Tugas_Video_${new Date().toISOString().slice(0, 10)}.csv`);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             });
-
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.setAttribute('href', url);
-            link.setAttribute('download', `Nilai_Tugas_Video_${new Date().toISOString().slice(0, 10)}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
         }
     </script>
 </body>
